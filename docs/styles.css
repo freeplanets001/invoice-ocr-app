@@ -330,19 +330,20 @@ body {
 
 /* GitHubセクション内のコードブロック */
 .github-section .code-block {
-  background: #0d1117;
-  border: 1px solid #30363d;
+  background: #ffffff;
+  border: 2px solid #d0d7de;
 }
 
 .github-section .code-block .code-header {
-  background: #161b22;
-  border-bottom: 1px solid #30363d;
+  background: #f6f8fa;
+  border-bottom: 2px solid #d0d7de;
+  color: #24292f;
 }
 
 .github-section .code-block code {
-  color: #c9d1d9;
-  font-size: 1rem;
-  font-weight: 500;
+  color: #24292f;
+  font-size: 1.05rem;
+  font-weight: 600;
 }
 
 .copy-btn.small {
@@ -433,16 +434,16 @@ body {
    ======================================== */
 
 .code-block {
-  background: #1a1a2e;
+  background: #f8f9fa;
   border-radius: 8px;
   margin-bottom: 16px;
   overflow: hidden;
-  border: 1px solid #2d2d44;
+  border: 2px solid #e9ecef;
 }
 
 .code-block.success {
-  background: #064e3b;
-  border-color: #059669;
+  background: #d1fae5;
+  border-color: #10b981;
 }
 
 .code-header {
@@ -450,10 +451,11 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: #252542;
+  background: #e9ecef;
   font-size: 0.85rem;
-  color: #a0a0b0;
-  border-bottom: 1px solid #2d2d44;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
 }
 
 .copy-btn {
@@ -483,32 +485,18 @@ body {
 
 .code-block code {
   font-family: 'Source Code Pro', monospace;
-  font-size: 0.95rem;
-  color: #f0f0f0;
+  font-size: 1rem;
+  color: #1a1a1a;
   line-height: 1.8;
-  font-weight: 500;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.placeholder {
-  color: #fcd34d;
-  background: rgba(251, 191, 36, 0.2);
-  padding: 2px 6px;
-  border-radius: 4px;
   font-weight: 600;
 }
 
-/* コードブロック内のシンタックスハイライト風 */
-.code-block code .command {
-  color: #67e8f9;
-}
-
-.code-block code .flag {
-  color: #a78bfa;
-}
-
-.code-block code .string {
-  color: #86efac;
+.placeholder {
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
 }
 
 code {
