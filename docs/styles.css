@@ -260,6 +260,80 @@ body {
 }
 
 /* ========================================
+   GitHubセクション
+   ======================================== */
+
+.github-section {
+  margin-top: 32px;
+  background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  color: white;
+}
+
+.github-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.github-icon {
+  font-size: 2rem;
+}
+
+.github-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.github-header p {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+}
+
+.github-content {
+  padding: 20px 24px;
+}
+
+.github-url {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.github-url .label,
+.github-clone .label {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  min-width: 100px;
+}
+
+.github-url code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #58a6ff;
+}
+
+.github-clone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.copy-btn.small {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+}
+
+/* ========================================
    セクション
    ======================================== */
 

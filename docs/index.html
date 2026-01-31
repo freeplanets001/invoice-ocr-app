@@ -120,6 +120,35 @@
           </div>
         </div>
       </div>
+
+      <!-- GitHubリポジトリ情報 -->
+      <div class="github-section">
+        <div class="github-header">
+          <span class="github-icon">📦</span>
+          <div>
+            <h3>ソースコード</h3>
+            <p>GitHubリポジトリからクローンして使用します</p>
+          </div>
+        </div>
+        <div class="github-content">
+          <div class="github-url">
+            <span class="label">リポジトリURL:</span>
+            <code>https://github.com/freeplanets001/invoice-ocr-app</code>
+            <button class="copy-btn small" onclick="copyToClipboard('https://github.com/freeplanets001/invoice-ocr-app')">コピー</button>
+          </div>
+          <div class="github-clone">
+            <span class="label">クローンコマンド:</span>
+            <div class="code-block" style="margin: 8px 0 0 0;">
+              <div class="code-header">
+                <span>Terminal</span>
+                <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+              </div>
+              <pre><code>git clone https://github.com/freeplanets001/invoice-ocr-app.git
+cd invoice-ocr-app</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- セクション1: 事前準備 -->
@@ -150,8 +179,19 @@
           <label class="checklist-item">
             <input type="checkbox" data-section="1">
             <span class="checkmark"></span>
-            <span>このアプリのソースコード一式</span>
+            <span>ソースコード（上記GitHubからクローン済み）</span>
           </label>
+        </div>
+
+        <h3>ソースコードのクローン</h3>
+        <p>まだクローンしていない場合は、以下のコマンドでソースコードを取得します：</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>git clone https://github.com/freeplanets001/invoice-ocr-app.git
+cd invoice-ocr-app</code></pre>
         </div>
 
         <h3>Google Cloud SDK（gcloud）のインストール</h3>

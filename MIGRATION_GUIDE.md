@@ -4,6 +4,23 @@
 
 ---
 
+## ソースコード
+
+### GitHubリポジトリ
+
+| 項目 | 値 |
+|------|-----|
+| リポジトリURL | https://github.com/freeplanets001/invoice-ocr-app |
+| クローンコマンド | `git clone https://github.com/freeplanets001/invoice-ocr-app.git` |
+
+```bash
+# ソースコードの取得
+git clone https://github.com/freeplanets001/invoice-ocr-app.git
+cd invoice-ocr-app
+```
+
+---
+
 ## 目次
 
 1. [事前準備](#1-事前準備)
@@ -27,7 +44,7 @@
 - [ ] Googleアカウント（GCPに使用）
 - [ ] クレジットカード（GCP課金設定用、無料枠あり）
 - [ ] パソコン（Windows/Mac/Linux）
-- [ ] このアプリのソースコード一式
+- [ ] ソースコード（上記GitHubからクローン済み）
 
 ### 必要なツールのインストール
 

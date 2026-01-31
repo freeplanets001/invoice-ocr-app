@@ -275,6 +275,30 @@ function copyCode(btn) {
   });
 }
 
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    // 簡易フィードバック
+    const notification = document.createElement('div');
+    notification.textContent = 'コピーしました！';
+    notification.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #16a34a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      z-index: 1000;
+      animation: fadeInOut 2s ease;
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2000);
+  }).catch(err => {
+    console.error('コピーに失敗しました:', err);
+  });
+}
+
 function toggleAccordion(btn) {
   const accordion = btn.closest('.accordion');
   accordion.classList.toggle('open');

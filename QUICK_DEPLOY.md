@@ -4,7 +4,18 @@
 
 ---
 
+## ソースコード取得
+
+```bash
+git clone https://github.com/freeplanets001/invoice-ocr-app.git
+cd invoice-ocr-app
+```
+
+---
+
 ## 事前準備完了チェックリスト
+
+- [ ] ソースコードをクローン済み
 
 - [ ] GCPプロジェクト作成済み
 - [ ] Firebase設定済み
