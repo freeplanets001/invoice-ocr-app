@@ -328,6 +328,23 @@ body {
   gap: 8px;
 }
 
+/* GitHubセクション内のコードブロック */
+.github-section .code-block {
+  background: #0d1117;
+  border: 1px solid #30363d;
+}
+
+.github-section .code-block .code-header {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.github-section .code-block code {
+  color: #c9d1d9;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .copy-btn.small {
   padding: 6px 12px;
   font-size: 0.75rem;
@@ -416,24 +433,27 @@ body {
    ======================================== */
 
 .code-block {
-  background: var(--gray-900);
+  background: #1a1a2e;
   border-radius: 8px;
   margin-bottom: 16px;
   overflow: hidden;
+  border: 1px solid #2d2d44;
 }
 
 .code-block.success {
   background: #064e3b;
+  border-color: #059669;
 }
 
 .code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 0.8rem;
-  color: var(--gray-400);
+  padding: 10px 16px;
+  background: #252542;
+  font-size: 0.85rem;
+  color: #a0a0b0;
+  border-bottom: 1px solid #2d2d44;
 }
 
 .copy-btn {
@@ -456,22 +476,39 @@ body {
 }
 
 .code-block pre {
-  padding: 16px;
+  padding: 20px;
   overflow-x: auto;
+  margin: 0;
 }
 
 .code-block code {
   font-family: 'Source Code Pro', monospace;
-  font-size: 0.9rem;
-  color: #e5e7eb;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  color: #f0f0f0;
+  line-height: 1.8;
+  font-weight: 500;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .placeholder {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  padding: 2px 4px;
+  color: #fcd34d;
+  background: rgba(251, 191, 36, 0.2);
+  padding: 2px 6px;
   border-radius: 4px;
+  font-weight: 600;
+}
+
+/* コードブロック内のシンタックスハイライト風 */
+.code-block code .command {
+  color: #67e8f9;
+}
+
+.code-block code .flag {
+  color: #a78bfa;
+}
+
+.code-block code .string {
+  color: #86efac;
 }
 
 code {
