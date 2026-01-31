@@ -1,0 +1,49 @@
+# ============================================
+# 移行用テンプレート
+# このファイルをcloudbuild.yamlにコピーして
+# 【】内の値を実際の値に置き換えてください
+# ============================================
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--platform'
+      - 'linux/amd64'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/backend:latest'
+      - '.'
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/backend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'invoice-api'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/backend:latest'
+      - '--region'
+      - 'asia-northeast1'
+      - '--port'
+      - '8080'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GCP_PROJECT_ID=【プロジェクトID】,GEMINI_API_KEY=【GeminiのAPIキー】'
+
+images:
+  - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/backend:latest'
+
+# ============================================
+# 置き換える項目一覧
+# ============================================
+# 【プロジェクトID】    : GCPプロジェクトID (例: invoice-app-123456)
+# 【GeminiのAPIキー】   : Google AI Studioで取得したAPIキー
+# ============================================

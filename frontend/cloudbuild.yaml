@@ -1,0 +1,48 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--platform'
+      - 'linux/amd64'
+      - '--build-arg'
+      - 'VITE_FIREBASE_API_KEY=AIzaSyAHM3l84YeedJSe2K-DAaW1JAs9ExSP7Y4'
+      - '--build-arg'
+      - 'VITE_FIREBASE_AUTH_DOMAIN=invoice-app-485304.firebaseapp.com'
+      - '--build-arg'
+      - 'VITE_FIREBASE_PROJECT_ID=invoice-app-485304'
+      - '--build-arg'
+      - 'VITE_FIREBASE_STORAGE_BUCKET=invoice-app-485304.appspot.com'
+      - '--build-arg'
+      - 'VITE_FIREBASE_MESSAGING_SENDER_ID=904732349675'
+      - '--build-arg'
+      - 'VITE_FIREBASE_APP_ID=1:904732349675:web:9cfb0936730944cf7edaae'
+      - '--build-arg'
+      - 'VITE_API_URL=https://invoice-api-904732349675.asia-northeast1.run.app'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/invoice-app-485304/invoice-app/frontend:latest'
+      - '.'
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/invoice-app-485304/invoice-app/frontend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'invoice-frontend'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/invoice-app-485304/invoice-app/frontend:latest'
+      - '--region'
+      - 'asia-northeast1'
+      - '--port'
+      - '80'
+      - '--allow-unauthenticated'
+
+images:
+  - 'asia-northeast1-docker.pkg.dev/invoice-app-485304/invoice-app/frontend:latest'

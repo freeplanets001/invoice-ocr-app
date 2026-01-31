@@ -1,0 +1,39 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--platform'
+      - 'linux/amd64'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/invoice-app/backend:latest'
+      - '.'
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/invoice-app/backend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'invoice-api'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/invoice-app/backend:latest'
+      - '--region'
+      - 'asia-northeast1'
+      - '--port'
+      - '8080'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GCP_PROJECT_ID=${PROJECT_ID},GEMINI_API_KEY=${_GEMINI_API_KEY}'
+
+images:
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/invoice-app/backend:latest'
+
+substitutions:
+  _GEMINI_API_KEY: ''  # デプロイ時に --substitutions オプションで指定

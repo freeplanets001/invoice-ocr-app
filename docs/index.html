@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>帳票データ化アプリ - GCP環境移行マニュアル</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- サイドバー -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>📄 移行マニュアル</h1>
+      <p class="subtitle">帳票データ化アプリ</p>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-label">
+        <span>進捗</span>
+        <span id="progress-text">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="#section-1" class="nav-item" data-section="1">
+        <span class="nav-number">1</span>
+        <span class="nav-text">事前準備</span>
+        <span class="nav-check" id="check-1"></span>
+      </a>
+      <a href="#section-2" class="nav-item" data-section="2">
+        <span class="nav-number">2</span>
+        <span class="nav-text">GCPプロジェクト作成</span>
+        <span class="nav-check" id="check-2"></span>
+      </a>
+      <a href="#section-3" class="nav-item" data-section="3">
+        <span class="nav-number">3</span>
+        <span class="nav-text">API有効化</span>
+        <span class="nav-check" id="check-3"></span>
+      </a>
+      <a href="#section-4" class="nav-item" data-section="4">
+        <span class="nav-number">4</span>
+        <span class="nav-text">Firebase設定</span>
+        <span class="nav-check" id="check-4"></span>
+      </a>
+      <a href="#section-5" class="nav-item" data-section="5">
+        <span class="nav-number">5</span>
+        <span class="nav-text">Artifact Registry</span>
+        <span class="nav-check" id="check-5"></span>
+      </a>
+      <a href="#section-6" class="nav-item" data-section="6">
+        <span class="nav-number">6</span>
+        <span class="nav-text">Gemini APIキー</span>
+        <span class="nav-check" id="check-6"></span>
+      </a>
+      <a href="#section-7" class="nav-item" data-section="7">
+        <span class="nav-number">7</span>
+        <span class="nav-text">設定ファイル更新</span>
+        <span class="nav-check" id="check-7"></span>
+      </a>
+      <a href="#section-8" class="nav-item" data-section="8">
+        <span class="nav-number">8</span>
+        <span class="nav-text">バックエンドデプロイ</span>
+        <span class="nav-check" id="check-8"></span>
+      </a>
+      <a href="#section-9" class="nav-item" data-section="9">
+        <span class="nav-number">9</span>
+        <span class="nav-text">フロントエンドデプロイ</span>
+        <span class="nav-check" id="check-9"></span>
+      </a>
+      <a href="#section-10" class="nav-item" data-section="10">
+        <span class="nav-number">10</span>
+        <span class="nav-text">動作確認</span>
+        <span class="nav-check" id="check-10"></span>
+      </a>
+      <a href="#section-11" class="nav-item" data-section="11">
+        <span class="nav-number">11</span>
+        <span class="nav-text">トラブルシューティング</span>
+        <span class="nav-check" id="check-11"></span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="reset-btn" onclick="resetProgress()">進捗をリセット</button>
+    </div>
+  </aside>
+
+  <!-- メインコンテンツ -->
+  <main class="main-content">
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰ メニュー</button>
+
+    <!-- イントロダクション -->
+    <header class="page-header">
+      <h1>帳票データ化アプリ<br>GCP環境移行マニュアル</h1>
+      <p class="lead">このマニュアルでは、帳票データ化アプリを新しいGCPアカウント/プロジェクトに移行する手順を説明します。初心者の方でも順番に進めればデプロイできるように構成しています。</p>
+
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-icon">⏱️</div>
+          <div class="info-content">
+            <div class="info-label">所要時間</div>
+            <div class="info-value">約60〜90分</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📋</div>
+          <div class="info-content">
+            <div class="info-label">ステップ数</div>
+            <div class="info-value">11ステップ</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">💰</div>
+          <div class="info-content">
+            <div class="info-label">費用</div>
+            <div class="info-value">無料枠内</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- セクション1: 事前準備 -->
+    <section class="section" id="section-1">
+      <div class="section-header">
+        <span class="section-number">1</span>
+        <h2>事前準備</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>必要なもの</h3>
+        <div class="checklist">
+          <label class="checklist-item">
+            <input type="checkbox" data-section="1">
+            <span class="checkmark"></span>
+            <span>Googleアカウント（GCPに使用）</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" data-section="1">
+            <span class="checkmark"></span>
+            <span>クレジットカード（GCP課金設定用、無料枠あり）</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" data-section="1">
+            <span class="checkmark"></span>
+            <span>パソコン（Windows/Mac/Linux）</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" data-section="1">
+            <span class="checkmark"></span>
+            <span>このアプリのソースコード一式</span>
+          </label>
+        </div>
+
+        <h3>Google Cloud SDK（gcloud）のインストール</h3>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="mac">Mac</button>
+          <button class="tab-btn" data-tab="windows">Windows</button>
+        </div>
+
+        <div class="tab-content active" id="tab-mac">
+          <p>Homebrewを使用してインストールします：</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <pre><code>brew install --cask google-cloud-sdk</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-windows">
+          <ol>
+            <li><a href="https://cloud.google.com/sdk/docs/install" target="_blank">https://cloud.google.com/sdk/docs/install</a> にアクセス</li>
+            <li>「Windows用インストーラ」をダウンロード</li>
+            <li>ダウンロードしたファイルを実行してインストール</li>
+          </ol>
+        </div>
+
+        <h3>インストール確認</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>gcloud --version</code></pre>
+        </div>
+        <p class="note">バージョン番号が表示されればOKです。</p>
+
+        <h3>gcloudの初期設定</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>gcloud init</code></pre>
+        </div>
+        <p>画面の指示に従って：</p>
+        <ol>
+          <li>Googleアカウントでログイン（ブラウザが開きます）</li>
+          <li>プロジェクトの選択（後で作成するのでスキップしてOK）</li>
+        </ol>
+
+        <button class="complete-btn" onclick="completeSection(1)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション2: GCPプロジェクト作成 -->
+    <section class="section" id="section-2">
+      <div class="section-header">
+        <span class="section-number">2</span>
+        <h2>GCPプロジェクトの作成</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>2.1 GCPコンソールにアクセス</h3>
+        <ol>
+          <li>ブラウザで <a href="https://console.cloud.google.com/" target="_blank">https://console.cloud.google.com/</a> を開く</li>
+          <li>Googleアカウントでログイン</li>
+        </ol>
+
+        <h3>2.2 新しいプロジェクトを作成</h3>
+        <div class="step-cards">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">画面上部の「プロジェクトを選択」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">右上の「新しいプロジェクト」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <strong>プロジェクト名:</strong> <code>invoice-app</code>（任意の名前でOK）<br>
+              <strong>プロジェクトID:</strong> 自動生成されます<br>
+              <strong>場所:</strong> 「組織なし」のままでOK
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">「作成」をクリック</div>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <strong>重要</strong>: プロジェクトIDは後で何度も使います。メモしておいてください。<br>
+            例: <code>invoice-app-123456</code>
+          </div>
+        </div>
+
+        <h3>2.3 課金の有効化</h3>
+        <ol>
+          <li>左メニューから「お支払い」を選択</li>
+          <li>「アカウントをリンク」または「課金を有効にする」をクリック</li>
+          <li>クレジットカード情報を入力</li>
+        </ol>
+
+        <div class="info-box">
+          <div class="info-box-icon">💡</div>
+          <div class="info-box-content">
+            無料トライアル（$300分）があるので、テスト段階では課金されません。
+          </div>
+        </div>
+
+        <!-- メモ欄 -->
+        <div class="memo-section">
+          <h4>📝 メモ欄</h4>
+          <div class="memo-field">
+            <label>プロジェクトID:</label>
+            <input type="text" id="memo-project-id" placeholder="例: invoice-app-123456" onchange="saveMemo()">
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(2)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション3: API有効化 -->
+    <section class="section" id="section-3">
+      <div class="section-header">
+        <span class="section-number">3</span>
+        <h2>必要なAPIの有効化</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>有効化する方法</h3>
+        <ol>
+          <li>左メニュー → 「APIとサービス」→「ライブラリ」</li>
+          <li>検索ボックスでAPI名を検索</li>
+          <li>該当のAPIをクリック</li>
+          <li>「有効にする」をクリック</li>
+        </ol>
+
+        <h3>有効にするAPI一覧</h3>
+        <div class="api-table">
+          <div class="api-row header">
+            <div class="api-name">API名</div>
+            <div class="api-desc">用途</div>
+            <div class="api-status">完了</div>
+          </div>
+          <div class="api-row">
+            <div class="api-name">Cloud Run Admin API</div>
+            <div class="api-desc">アプリのホスティング</div>
+            <div class="api-status"><input type="checkbox" data-section="3"></div>
+          </div>
+          <div class="api-row">
+            <div class="api-name">Cloud Build API</div>
+            <div class="api-desc">自動ビルド・デプロイ</div>
+            <div class="api-status"><input type="checkbox" data-section="3"></div>
+          </div>
+          <div class="api-row">
+            <div class="api-name">Artifact Registry API</div>
+            <div class="api-desc">Dockerイメージの保存</div>
+            <div class="api-status"><input type="checkbox" data-section="3"></div>
+          </div>
+          <div class="api-row">
+            <div class="api-name">Secret Manager API</div>
+            <div class="api-desc">シークレット管理</div>
+            <div class="api-status"><input type="checkbox" data-section="3"></div>
+          </div>
+          <div class="api-row">
+            <div class="api-name">Generative Language API</div>
+            <div class="api-desc">Gemini AI</div>
+            <div class="api-status"><input type="checkbox" data-section="3"></div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>コマンドで一括有効化（上級者向け）</span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-content">
+            <div class="code-block">
+              <div class="code-header">
+                <span>Terminal</span>
+                <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+              </div>
+              <pre><code># プロジェクトを設定
+gcloud config set project YOUR_PROJECT_ID
+
+# APIを有効化
+gcloud services enable \
+  run.googleapis.com \
+  cloudbuild.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com \
+  generativelanguage.googleapis.com</code></pre>
+            </div>
+            <p class="note"><code>YOUR_PROJECT_ID</code> は実際のプロジェクトIDに置き換えてください</p>
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(3)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション4: Firebase設定 -->
+    <section class="section" id="section-4">
+      <div class="section-header">
+        <span class="section-number">4</span>
+        <h2>Firebaseプロジェクトの設定</h2>
+      </div>
+
+      <div class="section-content">
+        <p>Firebaseは認証（ログイン機能）に使用します。</p>
+
+        <h3>4.1 Firebaseコンソールにアクセス</h3>
+        <ol>
+          <li><a href="https://console.firebase.google.com/" target="_blank">https://console.firebase.google.com/</a> を開く</li>
+          <li>Googleアカウントでログイン</li>
+        </ol>
+
+        <h3>4.2 Firebaseプロジェクトを作成</h3>
+        <div class="step-cards">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">「プロジェクトを追加」をクリック</div>
+          </div>
+          <div class="step-card highlight">
+            <div class="step-number">2</div>
+            <div class="step-content"><strong>先ほど作成したGCPプロジェクトを選択</strong>（新規作成ではなく、既存のGCPプロジェクトを選ぶ）</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">「続行」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">Google アナリティクスは「今は設定しない」でOK</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-content">「Firebaseを追加」をクリック</div>
+          </div>
+        </div>
+
+        <h3>4.3 認証（Authentication）の設定</h3>
+        <ol>
+          <li>左メニュー →「Authentication」をクリック</li>
+          <li>「始める」をクリック</li>
+          <li>「メール/パスワード」をクリック</li>
+          <li>「有効にする」をオンにして「保存」</li>
+        </ol>
+
+        <h3>4.4 ウェブアプリの追加</h3>
+        <ol>
+          <li>プロジェクト概要画面で「<code>&lt;/&gt;</code>」（ウェブ）アイコンをクリック</li>
+          <li>アプリのニックネームを入力（例: <code>invoice-frontend</code>）</li>
+          <li>「アプリを登録」をクリック</li>
+          <li>表示される設定情報をメモ</li>
+        </ol>
+
+        <!-- Firebase設定メモ欄 -->
+        <div class="memo-section">
+          <h4>📝 Firebase設定値メモ</h4>
+          <div class="memo-field">
+            <label>apiKey:</label>
+            <input type="text" id="memo-firebase-apikey" placeholder="AIzaSy..." onchange="saveMemo()">
+          </div>
+          <div class="memo-field">
+            <label>authDomain:</label>
+            <input type="text" id="memo-firebase-authdomain" placeholder="xxx.firebaseapp.com" onchange="saveMemo()">
+          </div>
+          <div class="memo-field">
+            <label>projectId:</label>
+            <input type="text" id="memo-firebase-projectid" placeholder="xxx" onchange="saveMemo()">
+          </div>
+          <div class="memo-field">
+            <label>storageBucket:</label>
+            <input type="text" id="memo-firebase-storagebucket" placeholder="xxx.appspot.com" onchange="saveMemo()">
+          </div>
+          <div class="memo-field">
+            <label>messagingSenderId:</label>
+            <input type="text" id="memo-firebase-senderid" placeholder="123456789" onchange="saveMemo()">
+          </div>
+          <div class="memo-field">
+            <label>appId:</label>
+            <input type="text" id="memo-firebase-appid" placeholder="1:123456789:web:abc123" onchange="saveMemo()">
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(4)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション5: Artifact Registry -->
+    <section class="section" id="section-5">
+      <div class="section-header">
+        <span class="section-number">5</span>
+        <h2>Artifact Registryの作成</h2>
+      </div>
+
+      <div class="section-content">
+        <p>DockerイメージをGCPに保存するための場所を作ります。</p>
+
+        <h3>GCPコンソールで作成</h3>
+        <div class="step-cards">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">GCPコンソール → 左メニュー →「Artifact Registry」</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">「リポジトリを作成」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <strong>名前:</strong> <code>invoice-app</code><br>
+              <strong>形式:</strong> <code>Docker</code><br>
+              <strong>モード:</strong> <code>標準</code><br>
+              <strong>ロケーションタイプ:</strong> <code>リージョン</code><br>
+              <strong>リージョン:</strong> <code>asia-northeast1（東京）</code>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">「作成」をクリック</div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <span>コマンドで作成（上級者向け）</span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-content">
+            <div class="code-block">
+              <div class="code-header">
+                <span>Terminal</span>
+                <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+              </div>
+              <pre><code>gcloud artifacts repositories create invoice-app \
+  --repository-format=docker \
+  --location=asia-northeast1 \
+  --description="Invoice App Docker images"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(5)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション6: Gemini APIキー -->
+    <section class="section" id="section-6">
+      <div class="section-header">
+        <span class="section-number">6</span>
+        <h2>Gemini APIキーの取得</h2>
+      </div>
+
+      <div class="section-content">
+        <p>AIによる帳票読み取りに使用するAPIキーを取得します。</p>
+
+        <h3>Google AI Studioでキーを作成</h3>
+        <div class="step-cards">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content"><a href="https://aistudio.google.com/" target="_blank">https://aistudio.google.com/</a> にアクセス</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">Googleアカウントでログイン</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">左メニュー →「Get API key」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">「Create API key」をクリック</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-content">先ほど作成したGCPプロジェクトを選択</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">6</div>
+            <div class="step-content">表示されたAPIキーをメモ（安全な場所に保管）</div>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <div class="warning-icon">🔐</div>
+          <div class="warning-content">
+            <strong>重要</strong>: APIキーは他人に見せないでください。漏洩すると悪用される可能性があります。
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h4>📝 メモ欄</h4>
+          <div class="memo-field">
+            <label>Gemini APIキー:</label>
+            <input type="password" id="memo-gemini-key" placeholder="AIzaSy..." onchange="saveMemo()">
+            <button class="toggle-visibility" onclick="toggleVisibility('memo-gemini-key', this)">表示</button>
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(6)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション7: 設定ファイル更新 -->
+    <section class="section" id="section-7">
+      <div class="section-header">
+        <span class="section-number">7</span>
+        <h2>設定ファイルの更新</h2>
+      </div>
+
+      <div class="section-content">
+        <p>ソースコード内の設定を新しいプロジェクト用に更新します。</p>
+
+        <h3>置き換える項目一覧</h3>
+        <div class="config-table">
+          <div class="config-row header">
+            <div class="config-item">項目</div>
+            <div class="config-value">あなたの値</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【プロジェクトID】</div>
+            <div class="config-value" id="display-project-id">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのapiKey】</div>
+            <div class="config-value" id="display-firebase-apikey">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのauthDomain】</div>
+            <div class="config-value" id="display-firebase-authdomain">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのprojectId】</div>
+            <div class="config-value" id="display-firebase-projectid">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのstorageBucket】</div>
+            <div class="config-value" id="display-firebase-storagebucket">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのmessagingSenderId】</div>
+            <div class="config-value" id="display-firebase-senderid">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【FirebaseのappId】</div>
+            <div class="config-value" id="display-firebase-appid">未入力</div>
+          </div>
+          <div class="config-row">
+            <div class="config-item">【GeminiのAPIキー】</div>
+            <div class="config-value" id="display-gemini-key">未入力</div>
+          </div>
+        </div>
+
+        <h3>バックエンドの設定</h3>
+        <p><code>backend/cloudbuild.yaml.template</code> を <code>backend/cloudbuild.yaml</code> にコピーして、上記の値を置き換えてください。</p>
+
+        <h3>フロントエンドの設定</h3>
+        <p><code>frontend/cloudbuild.yaml.template</code> を <code>frontend/cloudbuild.yaml</code> にコピーして、上記の値を置き換えてください。</p>
+
+        <div class="info-box">
+          <div class="info-box-icon">💡</div>
+          <div class="info-box-content">
+            <code>VITE_API_URL</code>（バックエンドのURL）は、セクション8でバックエンドをデプロイした後に取得します。
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(7)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション8: バックエンドデプロイ -->
+    <section class="section" id="section-8">
+      <div class="section-header">
+        <span class="section-number">8</span>
+        <h2>バックエンドのデプロイ</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>8.1 ターミナルを開く</h3>
+        <ul>
+          <li><strong>Mac:</strong> アプリケーション → ユーティリティ → ターミナル</li>
+          <li><strong>Windows:</strong> スタートメニュー → 「cmd」で検索 → コマンドプロンプト</li>
+        </ul>
+
+        <h3>8.2 プロジェクトを設定</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>gcloud config set project <span class="placeholder" id="code-project-id-1">YOUR_PROJECT_ID</span></code></pre>
+        </div>
+
+        <h3>8.3 バックエンドフォルダに移動</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>cd /path/to/invoice-app/backend</code></pre>
+        </div>
+        <p class="note"><code>/path/to/invoice-app</code> は実際のフォルダパスに置き換えてください</p>
+
+        <h3>8.4 デプロイを実行</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>gcloud builds submit --config cloudbuild.yaml --region=asia-northeast1</code></pre>
+        </div>
+
+        <h3>8.5 デプロイ完了を確認</h3>
+        <p>成功すると以下のようなメッセージが表示されます：</p>
+        <div class="code-block success">
+          <pre><code>Service [invoice-api] revision [invoice-api-00001-xxx] has been deployed
+Service URL: https://invoice-api-XXXXXXXXXX.asia-northeast1.run.app</code></pre>
+        </div>
+
+        <div class="warning-box">
+          <div class="warning-icon">📋</div>
+          <div class="warning-content">
+            この <strong>Service URL</strong> をメモしてください！フロントエンドの設定に使います。
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h4>📝 メモ欄</h4>
+          <div class="memo-field">
+            <label>バックエンドURL:</label>
+            <input type="text" id="memo-backend-url" placeholder="https://invoice-api-xxx.asia-northeast1.run.app" onchange="saveMemo()">
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(8)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション9: フロントエンドデプロイ -->
+    <section class="section" id="section-9">
+      <div class="section-header">
+        <span class="section-number">9</span>
+        <h2>フロントエンドのデプロイ</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>9.1 バックエンドURLを設定</h3>
+        <p><code>frontend/cloudbuild.yaml</code> の <code>VITE_API_URL</code> を、先ほどメモしたバックエンドのURLに更新します。</p>
+        <div class="code-block">
+          <pre><code>- 'VITE_API_URL=<span class="placeholder" id="code-backend-url">https://invoice-api-xxx.asia-northeast1.run.app</span>'</code></pre>
+        </div>
+
+        <h3>9.2 フロントエンドフォルダに移動</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>cd /path/to/invoice-app/frontend</code></pre>
+        </div>
+
+        <h3>9.3 デプロイを実行</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span>Terminal</span>
+            <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+          </div>
+          <pre><code>gcloud builds submit --config cloudbuild.yaml --region=asia-northeast1</code></pre>
+        </div>
+
+        <h3>9.4 デプロイ完了を確認</h3>
+        <p>成功すると以下のようなメッセージが表示されます：</p>
+        <div class="code-block success">
+          <pre><code>Service [invoice-frontend] revision [invoice-frontend-00001-xxx] has been deployed
+Service URL: https://invoice-frontend-XXXXXXXXXX.asia-northeast1.run.app</code></pre>
+        </div>
+
+        <div class="success-box">
+          <div class="success-icon">🎉</div>
+          <div class="success-content">
+            この <strong>Service URL</strong> がアプリにアクセスするURLです！
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h4>📝 メモ欄</h4>
+          <div class="memo-field">
+            <label>フロントエンドURL:</label>
+            <input type="text" id="memo-frontend-url" placeholder="https://invoice-frontend-xxx.asia-northeast1.run.app" onchange="saveMemo()">
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(9)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション10: 動作確認 -->
+    <section class="section" id="section-10">
+      <div class="section-header">
+        <span class="section-number">10</span>
+        <h2>動作確認</h2>
+      </div>
+
+      <div class="section-content">
+        <h3>10.1 Firebase承認済みドメインの追加</h3>
+        <ol>
+          <li>Firebaseコンソール → Authentication → Settings</li>
+          <li>「承認済みドメイン」タブ</li>
+          <li>「ドメインを追加」をクリック</li>
+          <li>フロントエンドのドメインを追加<br>例: <code>invoice-frontend-xxx.asia-northeast1.run.app</code></li>
+        </ol>
+
+        <h3>10.2 アプリにアクセス</h3>
+        <ol>
+          <li>ブラウザでフロントエンドのURLを開く</li>
+          <li>アカウント作成/ログインができるか確認</li>
+          <li>帳票をアップロードしてデータ抽出ができるか確認</li>
+        </ol>
+
+        <h3>10.3 確認項目チェックリスト</h3>
+        <div class="final-checklist">
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>ログイン画面が表示される</span>
+          </label>
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>新規アカウントが作成できる</span>
+          </label>
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>ログインできる</span>
+          </label>
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>ファイルアップロードができる</span>
+          </label>
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>AIによるデータ抽出が動作する</span>
+          </label>
+          <label class="checklist-item large">
+            <input type="checkbox" data-section="10">
+            <span class="checkmark"></span>
+            <span>Excelダウンロードができる</span>
+          </label>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(10)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- セクション11: トラブルシューティング -->
+    <section class="section" id="section-11">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2>トラブルシューティング</h2>
+      </div>
+
+      <div class="section-content">
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Q1: デプロイ時に「Permission denied」エラーが出る</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p><strong>原因:</strong> 権限が不足しています</p>
+              <p><strong>解決方法:</strong></p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span>Terminal</span>
+                  <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+                </div>
+                <pre><code>PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Q2: ログインできない</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p><strong>確認ポイント:</strong></p>
+              <ol>
+                <li>FirebaseでAuthentication（メール/パスワード）が有効になっているか</li>
+                <li>承認済みドメインにCloud RunのURLが追加されているか</li>
+                <li><code>cloudbuild.yaml</code>のFirebase設定が正しいか</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Q3: 帳票の読み取りができない</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p><strong>確認ポイント:</strong></p>
+              <ol>
+                <li>Gemini APIキーが正しく設定されているか</li>
+                <li>バックエンドのCloud Runログを確認
+                  <ul>
+                    <li>GCPコンソール → Cloud Run → invoice-api → ログ</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Q4: 「APIが有効になっていません」エラー</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p><strong>解決方法:</strong></p>
+              <p>セクション3の手順に従って、必要なAPIを有効化してください。</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Q5: Cloud Buildが途中で失敗する</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p><strong>確認ポイント:</strong></p>
+              <ol>
+                <li>Dockerfileが正しいか</li>
+                <li>package.jsonに必要な依存関係があるか</li>
+                <li>Cloud Buildのログで詳細を確認</li>
+              </ol>
+              <p><strong>ログの確認方法:</strong></p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span>Terminal</span>
+                  <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+                </div>
+                <pre><code>gcloud builds list --limit=5
+gcloud builds log BUILD_ID</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="complete-btn" onclick="completeSection(11)">このセクションを完了</button>
+      </div>
+    </section>
+
+    <!-- 完了セクション -->
+    <section class="completion-section" id="completion-section" style="display: none;">
+      <div class="completion-content">
+        <div class="completion-icon">🎉</div>
+        <h2>おめでとうございます！</h2>
+        <p>すべてのセクションが完了しました。</p>
+
+        <div class="final-summary">
+          <h3>設定値まとめ</h3>
+          <div class="summary-grid" id="final-summary-grid">
+            <!-- JavaScriptで動的に生成 -->
+          </div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">📄 このページを印刷</button>
+      </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="page-footer">
+      <p>作成日: 2026年1月25日</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+# ============================================
+# 移行用テンプレート
+# このファイルをcloudbuild.yamlにコピーして
+# 【】内の値を実際の値に置き換えてください
+# ============================================
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--platform'
+      - 'linux/amd64'
+      - '--build-arg'
+      - 'VITE_FIREBASE_API_KEY=【FirebaseのapiKey】'
+      - '--build-arg'
+      - 'VITE_FIREBASE_AUTH_DOMAIN=【FirebaseのauthDomain】'
+      - '--build-arg'
+      - 'VITE_FIREBASE_PROJECT_ID=【FirebaseのprojectId】'
+      - '--build-arg'
+      - 'VITE_FIREBASE_STORAGE_BUCKET=【FirebaseのstorageBucket】'
+      - '--build-arg'
+      - 'VITE_FIREBASE_MESSAGING_SENDER_ID=【FirebaseのmessagingSenderId】'
+      - '--build-arg'
+      - 'VITE_FIREBASE_APP_ID=【FirebaseのappId】'
+      - '--build-arg'
+      - 'VITE_API_URL=【バックエンドのURL】'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/frontend:latest'
+      - '.'
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/frontend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'invoice-frontend'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/frontend:latest'
+      - '--region'
+      - 'asia-northeast1'
+      - '--port'
+      - '80'
+      - '--allow-unauthenticated'
+
+images:
+  - 'asia-northeast1-docker.pkg.dev/【プロジェクトID】/invoice-app/frontend:latest'
+
+# ============================================
+# 置き換える項目一覧
+# ============================================
+# 【プロジェクトID】        : GCPプロジェクトID (例: invoice-app-123456)
+# 【FirebaseのapiKey】      : Firebase設定のapiKey
+# 【FirebaseのauthDomain】  : Firebase設定のauthDomain
+# 【FirebaseのprojectId】   : Firebase設定のprojectId
+# 【FirebaseのstorageBucket】: Firebase設定のstorageBucket
+# 【FirebaseのmessagingSenderId】: Firebase設定のmessagingSenderId
+# 【FirebaseのappId】       : Firebase設定のappId
+# 【バックエンドのURL】     : バックエンドデプロイ後に取得したURL
+# ============================================
